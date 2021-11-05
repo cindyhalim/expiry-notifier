@@ -19,8 +19,8 @@ const serverlessConfiguration: AWS = {
   },
   plugins: [
     "serverless-webpack",
-    "serverless-iam-roles-per-function",
     "serverless-step-functions",
+    "serverless-iam-roles-per-function",
   ],
   provider: {
     name: "aws",
@@ -40,6 +40,9 @@ const serverlessConfiguration: AWS = {
       TWILIO_PHONE_NUMBER: "${ssm:/${self:service}/twilio-phone-number}",
       PHONE_NUMBER: "${ssm:/${self:service}/phone-number}",
       NOTIFIER_TABLE_NAME: "notifier-table-${self:provider.stage}",
+      // TODO: use reference and avoid circular dep
+      NOTIFIER_STATE_MACHINE_ARN:
+        "arn:aws:states:us-east-2:807602962743:stateMachine:notifier-state-machine-dev",
     },
     lambdaHashingVersion: "20201221",
   },
@@ -51,7 +54,7 @@ const serverlessConfiguration: AWS = {
       ...notifierTable,
     },
     Outputs: {
-      NotifierStateMachine: {
+      NotifierStateMachineARN: {
         Value: {
           Ref: "NotifierStateMachine",
         },

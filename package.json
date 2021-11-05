@@ -15,8 +15,8 @@
     "@notionhq/client": "^0.4.4",
     "luxon": "^2.0.2",
     "source-map-support": "^0.5.19",
-    "textbelt": "0.0.4",
-    "twilio": "^3.70.0"
+    "twilio": "^3.70.0",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@serverless/typescript": "^2.23.0",
