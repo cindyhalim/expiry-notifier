@@ -1,4 +1,3 @@
-import schema from "./schema";
 import { handlerPath } from "@utils";
 
 export default {
@@ -13,14 +12,9 @@ export default {
   ],
   events: [
     {
-      http: {
-        method: "post",
-        path: "checkNotion",
-        request: {
-          schema: {
-            "application/json": schema,
-          },
-        },
+      schedule: {
+        rate: ["cron(0 0 1 * ? *)"],
+        enabled: true,
       },
     },
   ],
