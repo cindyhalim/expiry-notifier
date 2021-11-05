@@ -2,7 +2,7 @@ export const notifierStateMachine = {
   id: "NotifierStateMachine",
   name: "notifier-state-machine-${self:provider.stage}",
   definition: {
-    Comment: "Orchestrates notify logic from Notion database records",
+    Comment: "Orchestrates notify logic from Notion table",
     StartAt: "CheckAlreadyNotified",
     States: {
       //TODO: replace this to get item directly in state matchine
@@ -73,16 +73,17 @@ export const notifierStateMachine = {
       Notify: {
         Type: "Task",
         Resource: { "Fn::GetAtt": ["onNotify", "Arn"] },
+        ResultPath: "$.isNotified",
         Next: "MarkAsNotified",
       },
       MarkAsNotified: {
         Type: "Task",
         Resource: "arn:aws:states:::dynamodb:putItem",
-        Paramters: {
+        Parameters: {
           TableName: { Ref: "NotifierTable" },
           Item: {
-            itemId: { S: "$.id" },
-            isNotified: { BOOL: true },
+            itemId: { "S.$": "$.id" },
+            isNotified: { "BOOL.$": "$.isNotified" },
           },
         },
         End: true,

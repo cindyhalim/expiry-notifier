@@ -18,15 +18,15 @@ const formatTextMessageBody = ({
       return `\n❗️ Reminder: upcoming event ${item} on ${formattedDate} `;
     case "expiry":
     default:
-      return `\n${item} is expiring on ${formattedDate}!😱\n
-      Make sure you renew on time.`;
+      return `😱 ${item} is expiring on ${formattedDate}– make sure to renew on time!!`;
   }
 };
 
-const onNotify = async ({ body: { item, date, type } }) => {
+const onNotify = async ({ item, date, type }) => {
   try {
     const messageBody = formatTextMessageBody({ item, date, type });
     await twilio.sendTextMessage(messageBody);
+    return true;
   } catch (e) {
     console.error("Error sending text message");
     throw new Error(`Error sending text message: ${e.message}`);

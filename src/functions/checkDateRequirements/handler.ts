@@ -1,7 +1,7 @@
 import { DateTime } from "luxon";
 import { middyfy } from "@utils";
 
-const checkDateRequirements = async ({ body: { date, notifyIn } }) => {
+const checkDateRequirements = async ({ date, notifyIn }) => {
   const deadline = DateTime.fromFormat(date, "yyyy-MM-dd");
   const currentDate = DateTime.now();
   const notifyInMonths = notifyIn || 1;
