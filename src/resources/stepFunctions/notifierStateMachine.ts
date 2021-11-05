@@ -1,37 +1,36 @@
 export const notifierStateMachine = {
-  id: "NotifierStateMachine",
+  id: "notifierStateMachine",
   name: "notifier-state-machine-${self:provider.stage}",
   definition: {
     Comment: "Orchestrates notify logic from Notion table",
     StartAt: "CheckAlreadyNotified",
     States: {
-      //TODO: replace this to get item directly in state matchine
       CheckAlreadyNotified: {
         Type: "Task",
-        Resource: { "Fn::GetAtt": ["checkIsNotified", "Arn"] },
-        Retry: [
-          {
-            ErrorEquals: ["States.ALL"],
-            IntervalSeconds: 1,
-            MaxAttempts: 3,
-            BackoffRate: 1.5,
+        Resource: "arn:aws:states:::dynamodb:getItem",
+        Parameters: {
+          TableName: { Ref: "NotifierTable" },
+          Key: {
+            itemId: {
+              "S.$": "$.id",
+            },
           },
-        ],
-        ResultPath: "$.isNotified",
+        },
+        ResultPath: "$.dynamoDb",
         Next: "VerifyAlreadyNotified",
       },
       VerifyAlreadyNotified: {
         Type: "Choice",
         Choices: [
           {
-            Variable: "$.isNotified",
-            BooleanEquals: false,
+            Variable: "$.dynamoDb.Item.itemId",
+            IsPresent: false,
             Next: "CheckDateRequirements",
           },
           {
-            Variable: "$.isNotified",
-            BooleanEquals: true,
-            Next: "EndEarly",
+            Variable: "$.dynamoDb.Item.itemId",
+            IsPresent: true,
+            Next: "SkipNotify",
           },
         ],
       },
@@ -60,13 +59,11 @@ export const notifierStateMachine = {
           {
             Variable: "$.meetsDateRequirements",
             BooleanEquals: false,
-            Next: "EndEarly",
+            Next: "SkipNotify",
           },
         ],
       },
-      //TODO: give output message so clearer indiciation
-      // ex: Already notified, Does not meet date requirements
-      EndEarly: {
+      SkipNotify: {
         Type: "Pass",
         End: true,
       },
@@ -84,6 +81,7 @@ export const notifierStateMachine = {
           Item: {
             itemId: { "S.$": "$.id" },
             isNotified: { "BOOL.$": "$.isNotified" },
+            timestamp: { S: new Date() },
           },
         },
         End: true,
