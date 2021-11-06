@@ -4,7 +4,7 @@
 
 Simple notification tool that sends early reminders via text message based on items from a Notion table. The primary use case is to remind events that can expire and is tedious/time consuming to renew (for ex: government ID's, passport).
 
-Built using **Serverless with AWS (Step Functions, DynamoDB, Lambda), Notion API, and Twilio API**.
+Built with **Serverless with AWS (Step Functions, DynamoDB, Lambda), Notion API, and Twilio API**.
 
 ## Setup instructions
 
@@ -62,6 +62,6 @@ The following parameters are required in AWS Systems Manager Parameter Store pri
 
 ### Security:
 
-As MVP, this was built with the assumption that the Notion table `item` property contains no sensitive information. With security in mind, a more restrictive measure should be taken to prevent AWS from reading the Step Functions data. Alex Fournier highlighted this in [his article](https://blog.theodo.com/2020/08/secure-aws-step-functions-sensitive-data/).
+As MVP, this project was built with the assumption that the Notion table `item` property contains no sensitive information. With security in mind, a more restrictive measure should be taken to prevent AWS from reading the Step Functions data. Alex Fournier highlighted this in [his article](https://blog.theodo.com/2020/08/secure-aws-step-functions-sensitive-data/).
 
 Instead of relying on the transmission of data between steps and retrieving it directly during their execution, a new DynamoDB table encrypted with external KMS keys can be created to store potentially sensitive data between steps.
