@@ -8,18 +8,16 @@ Built with **Serverless with AWS (Step Functions, DynamoDB, Lambda), Notion API,
 
 ## Setup instructions
 
-> **Requirements**: NodeJS `lts/fermium (v.14.15.0)`. If you're using [nvm](https://github.com/nvm-sh/nvm), run `nvm use` to ensure you're using the same Node version in local and in your lambda's runtime.
-
 ### **Notion Table:**
 
 Create a Notion table with the following properties:
 
-| Property   | Property Type | Description                                |
-| ---------- | ------------- | ------------------------------------------ |
-| `item`     | Text          | the event you want to be reminded for.     |
-| `type`     | Select        | `expiry` or `reminder`; default: `expiry`. |
-| `date`     | Date          | due date/expiry date of item.              |
-| `notifyIn` | Number        | remind me in X months; default: `1`.       |
+| Property   | Property Type | Required Field | Description                                |
+| ---------- | ------------- | -------------- | ------------------------------------------ |
+| `item`     | Text          | Yes            | the event you want to be reminded for.     |
+| `type`     | Select        | No             | `expiry` or `reminder`; default: `expiry`. |
+| `date`     | Date          | Yes            | due date/expiry date of item.              |
+| `notifyIn` | Number        | No             | remind me in X months; default: `1`.       |
 
 ![Notion Table Template](assets/notion-table-sample.png)
 
@@ -35,6 +33,8 @@ The following parameters are required in AWS Systems Manager Parameter Store pri
 - `phone-number`: the number that will receive the text message
 
 ### **Installation/deployment:**
+
+> **Requirements**: NodeJS `lts/fermium (v.14.15.0)`. If you're using [nvm](https://github.com/nvm-sh/nvm), run `nvm use` to ensure you're using the same Node version in local and in your lambda's runtime.
 
 #### Using NPM:
 
