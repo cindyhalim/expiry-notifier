@@ -1,95 +1,43 @@
-# Serverless - AWS Node.js Typescript
+# Expiry Notifier
 
-This project has been generated using the `aws-nodejs-typescript` template from the [Serverless framework](https://www.serverless.com/).
+### Description
 
-For detailed instructions, please refer to the [documentation](https://www.serverless.com/framework/docs/providers/aws/).
+Simple notification tool that sends early reminders via text message based on items from a Notion table. The primary use case is to remind events that can expire and is tedious/time consuming to renew. Built using Serverless with AWS (Step Functions, DynamoDB, Lambda), Notion API, and Twilio API.
 
-## Installation/deployment instructions
-
-Depending on your preferred package manager, follow the instructions below to deploy your project.
+### Installation/deployment instructions
 
 > **Requirements**: NodeJS `lts/fermium (v.14.15.0)`. If you're using [nvm](https://github.com/nvm-sh/nvm), run `nvm use` to ensure you're using the same Node version in local and in your lambda's runtime.
 
-### Using NPM
+**Notion Setup**:
+
+- Create a Notion table with the following properties:
+  ! [Notion Table Template](assets/notion-table-sample.png) - `item`: Text property | the event you want to be reminded for. - `type`: Select property | `expiry` or `reminder`; default is `expiry` - `date`: Date property | due date/expiry date of item - `notifyIn`: Number property | remind me in X months; default is `1`.
+
+**Dev Setup**:
+
+The following parameters are required in AWS Systems Manager Parameter Store prior to stack deployment:
+
+- `notion-token`: Notion's integration token. Refer to their API docs on how to set this up.
+- `notion-database-id`: the unique identifier of the Notion table
+- `twilio-auth-token`
+- `twilio-account-sid`
+- `twilio-phone-number`: the number used to send the text message
+- `phone-number`: the number that will receive the text message
+
+#### Using NPM:
 
 - Run `npm i` to install the project dependencies
 - Run `npx sls deploy` to deploy this stack to AWS
 
-### Using Yarn
+#### Using Yarn:
 
 - Run `yarn` to install the project dependencies
 - Run `yarn sls deploy` to deploy this stack to AWS
 
-## Test your service
+### Notion Table Setup:
 
-This template contains a single lambda function triggered by an HTTP request made on the provisioned API Gateway REST API `/hello` route with `POST` method. The request body must be provided as `application/json`. The body structure is tested by API Gateway against `src/functions/hello/schema.ts` JSON-Schema definition: it must contain the `name` property.
+### Notifier State Machine Orchestrator
 
-- requesting any other path than `/hello` with any other method than `POST` will result in API Gateway returning a `403` HTTP error code
-- sending a `POST` request to `/hello` with a payload **not** containing a string property named `name` will result in API Gateway returning a `400` HTTP error code
-- sending a `POST` request to `/hello` with a payload containing a string property named `name` will result in API Gateway returning a `200` HTTP status code with a message saluting the provided name and the detailed event processed by the lambda
+1. On the first day of the month, `checkNotion` handler queries the Notion table
 
-> :warning: As is, this template, once deployed, opens a **public** endpoint within your AWS account resources. Anybody with the URL can actively execute the API Gateway endpoint and the corresponding lambda. You should protect this endpoint with the authentication method of your choice.
-
-### Locally
-
-In order to test the hello function locally, run the following command:
-
-- `npx sls invoke local -f hello --path src/functions/hello/mock.json` if you're using NPM
-- `yarn sls invoke local -f hello --path src/functions/hello/mock.json` if you're using Yarn
-
-Check the [sls invoke local command documentation](https://www.serverless.com/framework/docs/providers/aws/cli-reference/invoke-local/) for more information.
-
-### Remotely
-
-Copy and replace your `url` - found in Serverless `deploy` command output - and `name` parameter in the following `curl` command in your terminal or in Postman to test your newly deployed application.
-
-```
-curl --location --request POST 'https://myApiEndpoint/dev/hello' \
---header 'Content-Type: application/json' \
---data-raw '{
-    "name": "Frederic"
-}'
-```
-
-## Template features
-
-### Project structure
-
-The project code base is mainly located within the `src` folder. This folder is divided in:
-
-- `functions` - containing code base and configuration for your lambda functions
-- `libs` - containing shared code base between your lambdas
-
-```
-.
-├── src
-│   ├── functions               # Lambda configuration and source code folder
-│   │   ├── hello
-│   │   │   ├── handler.ts      # `Hello` lambda source code
-│   │   │   ├── index.ts        # `Hello` lambda Serverless configuration
-│   │   │   ├── mock.json       # `Hello` lambda input parameter, if any, for local invocation
-│   │   │   └── schema.ts       # `Hello` lambda input event JSON-Schema
-│   │   │
-│   │   └── index.ts            # Import/export of all lambda configurations
-│   │
-│   └── libs                    # Lambda shared code
-│       └── apiGateway.ts       # API Gateway specific helpers
-│       └── handlerResolver.ts  # Sharable library for resolving lambda handlers
-│       └── lambda.ts           # Lambda middleware
-│
-├── package.json
-├── serverless.ts               # Serverless service file
-├── tsconfig.json               # Typescript compiler configuration
-├── tsconfig.paths.json         # Typescript paths
-└── webpack.config.js           # Webpack configuration
-```
-
-### 3rd party libraries
-
-- [json-schema-to-ts](https://github.com/ThomasAribart/json-schema-to-ts) - uses JSON-Schema definitions used by API Gateway for HTTP request validation to statically generate TypeScript types in your lambda's handler code base
-- [middy](https://github.com/middyjs/middy) - middleware engine for Node.Js lambda. This template uses [http-json-body-parser](https://github.com/middyjs/middy/tree/master/packages/http-json-body-parser) to convert API Gateway `event.body` property, originally passed as a stringified JSON, to its corresponding parsed object
-- [@serverless/typescript](https://github.com/serverless/typescript) - provides up-to-date TypeScript definitions for your `serverless.ts` service file
-
-### Advanced usage
-
-Any tsconfig.json can be used, but if you do, set the environment variable `TS_NODE_CONFIG` for building the application, eg `TS_NODE_CONFIG=./tsconfig.app.json npx serverless webpack`
+### Improvements
