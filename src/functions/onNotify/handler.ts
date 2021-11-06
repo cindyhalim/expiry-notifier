@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
 
-import { NotificationType, middyfy } from "@utils";
+import { NotificationType, middyfy, NotionItem } from "@utils";
 import { twilio } from "@services";
 
 const formatTextMessageBody = ({
@@ -22,7 +22,7 @@ const formatTextMessageBody = ({
   }
 };
 
-const onNotify = async ({ item, date, type }) => {
+const onNotify = async ({ item, date, type }: NotionItem) => {
   try {
     const messageBody = formatTextMessageBody({ item, date, type });
     await twilio.sendTextMessage(messageBody);
