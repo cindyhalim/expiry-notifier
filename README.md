@@ -14,14 +14,14 @@ Built using **Serverless with AWS (Step Functions, DynamoDB, Lambda), Notion API
 
 Create a Notion table with the following properties:
 
-![Notion Table Template](assets/notion-table-sample.png)
-
 | Property   | Property Type | Description                                |
 | ---------- | ------------- | ------------------------------------------ |
 | `item`     | Text          | the event you want to be reminded for.     |
 | `type`     | Select        | `expiry` or `reminder`; default: `expiry`. |
 | `date`     | Date          | due date/expiry date of item.              |
 | `notifyIn` | Number        | remind me in X months; default: `1`.       |
+
+![Notion Table Template](assets/notion-table-sample.png)
 
 ### **Parameters:**
 
@@ -45,6 +45,10 @@ The following parameters are required in AWS Systems Manager Parameter Store pri
 
 - Run `yarn` to install the project dependencies
 - Run `yarn sls deploy` to deploy this stack to AWS
+
+## Diagram
+
+![Architecture Diagram](assets/architecture-diagram.png)
 
 ## How it works
 
