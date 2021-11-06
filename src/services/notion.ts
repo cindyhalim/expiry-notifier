@@ -1,5 +1,5 @@
 import { Client } from "@notionhq/client";
-import { ItemModel } from "@utils";
+import { NotionItem } from "@utils";
 
 const client = new Client({ auth: process.env.NOTION_TOKEN });
 
@@ -7,7 +7,7 @@ const getItemsFromDatabase = async () => {
   const databaseId = process.env.NOTION_DATABASE_ID;
   const response = await client.databases.query({ database_id: databaseId });
 
-  const items: ItemModel[] = response.results
+  const items: NotionItem[] = response.results
     .map(({ id, properties }) => ({
       id,
       item: properties.item["title"][0]?.plain_text || null,

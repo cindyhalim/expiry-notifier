@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
 
-import { ItemType, middyfy } from "@utils";
+import { NotificationType, middyfy } from "@utils";
 import { twilio } from "@services";
 
 const formatTextMessageBody = ({
@@ -10,7 +10,7 @@ const formatTextMessageBody = ({
 }: {
   item: string;
   date: string;
-  type: ItemType;
+  type: NotificationType;
 }) => {
   const formattedDate = DateTime.fromFormat(date, "yyyy-MM-dd").toFormat("DDD");
   switch (type) {

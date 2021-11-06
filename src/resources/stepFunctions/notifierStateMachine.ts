@@ -1,6 +1,15 @@
-import { Serverless } from "step-functions-types";
+import { Serverless } from "@utils";
 
 type StateMachine = Serverless["stepFunctions"]["stateMachines"];
+
+const retrier = [
+  {
+    ErrorEquals: ["States.ALL"],
+    IntervalSeconds: 1,
+    MaxAttempts: 3,
+    BackoffRate: 1.5,
+  },
+];
 
 export const notifierStateMachine: StateMachine = {
   NotifierStateMachine: {
@@ -21,6 +30,7 @@ export const notifierStateMachine: StateMachine = {
               },
             },
           },
+          Retry: retrier,
           ResultPath: "$.dynamoDb",
           Next: "VerifyAlreadyNotified",
         },
@@ -38,18 +48,12 @@ export const notifierStateMachine: StateMachine = {
               Next: "SkipNotify",
             },
           ],
+          Retry: retrier,
         },
         CheckDateRequirements: {
           Type: "Task",
           Resource: { "Fn::GetAtt": ["onCheckDateRequirements", "Arn"] },
-          Retry: [
-            {
-              ErrorEquals: ["States.ALL"],
-              IntervalSeconds: 1,
-              MaxAttempts: 3,
-              BackoffRate: 1.5,
-            },
-          ],
+          Retry: retrier,
           ResultPath: "$.meetsDateRequirements",
           Next: "VerifyDateRequirements",
         },
@@ -67,6 +71,7 @@ export const notifierStateMachine: StateMachine = {
               Next: "SkipNotify",
             },
           ],
+          Retry: retrier,
         },
         SkipNotify: {
           Type: "Pass",
@@ -77,6 +82,7 @@ export const notifierStateMachine: StateMachine = {
           Resource: { "Fn::GetAtt": ["onNotify", "Arn"] },
           ResultPath: "$.isNotified",
           Next: "MarkAsNotified",
+          Retry: retrier,
         },
         MarkAsNotified: {
           Type: "Task",
@@ -89,6 +95,7 @@ export const notifierStateMachine: StateMachine = {
               timestamp: { S: new Date() },
             },
           },
+          Retry: retrier,
           End: true,
         },
       },

@@ -1,4 +1,4 @@
-// Step function types retrieved from https://github.com/serverless-operations/serverless-step-functions/issues/370
+// Step function types from https://github.com/serverless-operations/serverless-step-functions/issues/370
 import type { AWS } from "@serverless/typescript";
 
 type Definition = {

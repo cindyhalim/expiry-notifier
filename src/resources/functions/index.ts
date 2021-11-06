@@ -1,4 +1,4 @@
-import { Serverless } from "step-functions-types";
+import { Serverless } from "@utils";
 
 export const functions: Serverless["functions"] = {
   checkNotion: {

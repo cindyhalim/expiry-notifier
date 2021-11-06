@@ -20,6 +20,6 @@ export const main = async () => {
     );
     return await Promise.all(stateExecutions);
   } catch (e) {
-    //handle error here
+    throw new Error(`Error in checkNotion: ${e.message}`);
   }
 };
