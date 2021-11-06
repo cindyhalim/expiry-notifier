@@ -13,4 +13,4 @@ const checkDateRequirements = async ({ date, notifyIn }) => {
   return Boolean(roundedDiff > 0 && roundedDiff <= notifyInMonths);
 };
 
-export const main = middyfy(checkDateRequirements);
+export default middyfy(checkDateRequirements);

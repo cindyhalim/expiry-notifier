@@ -33,4 +33,4 @@ const onNotify = async ({ item, date, type }) => {
   }
 };
 
-export const main = middyfy(onNotify);
+export default middyfy(onNotify);

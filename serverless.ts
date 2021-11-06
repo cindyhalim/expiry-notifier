@@ -1,14 +1,7 @@
-import type { AWS } from "@serverless/typescript";
+import { notifierTable, notifierStateMachine, functions } from "@resources";
+import { Serverless } from "step-functions-types";
 
-import {
-  checkNotion,
-  checkDateRequirements,
-  checkIsNotified,
-  onNotify,
-} from "@functions";
-import { notifierTable, notifierStateMachine } from "@resources";
-
-const serverlessConfiguration: AWS = {
+const serverlessConfiguration: Serverless = {
   service: "expiry-notifier",
   frameworkVersion: "2",
   custom: {
@@ -40,15 +33,15 @@ const serverlessConfiguration: AWS = {
       TWILIO_PHONE_NUMBER: "${ssm:/${self:service}/twilio-phone-number}",
       PHONE_NUMBER: "${ssm:/${self:service}/phone-number}",
       NOTIFIER_TABLE_NAME: "notifier-table-${self:provider.stage}",
-      // TODO: use reference and avoid circular dep
       NOTIFIER_STATE_MACHINE_ARN:
-        "arn:aws:states:us-east-2:807602962743:stateMachine:notifier-state-machine-dev",
+        "arn:aws:states:${self:provider.region}:${aws:accountId}:stateMachine:${self:stepFunctions.stateMachines.NotifierStateMachine.name}",
     },
     lambdaHashingVersion: "20201221",
   },
-  functions: { checkNotion, checkDateRequirements, checkIsNotified, onNotify },
-  //@ts-ignore
-  stepFunctions: { stateMachines: { notifierStateMachine } },
+  functions,
+  stepFunctions: {
+    stateMachines: { ...notifierStateMachine },
+  },
   resources: {
     Resources: {
       ...notifierTable,

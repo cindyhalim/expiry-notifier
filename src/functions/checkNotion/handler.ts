@@ -2,18 +2,12 @@ import "source-map-support/register";
 import * as StepFunctions from "aws-sdk/clients/stepfunctions";
 import { v4 as uuidv4 } from "uuid";
 
-import {
-  ValidatedEventAPIGatewayProxyEvent,
-  formatJSONResponse,
-  middyfy,
-} from "@utils";
-import schema from "./schema";
 import { notion } from "@services";
 
 const stepFunctions = new StepFunctions();
 
-const checkNotion: ValidatedEventAPIGatewayProxyEvent<typeof schema> =
-  async () => {
+export const main = async () => {
+  try {
     const items = await notion.getItemsFromDatabase();
     const stateExecutions = items.map((item) =>
       stepFunctions
@@ -24,10 +18,8 @@ const checkNotion: ValidatedEventAPIGatewayProxyEvent<typeof schema> =
         })
         .promise()
     );
-    await Promise.all(stateExecutions);
-    return formatJSONResponse({
-      items,
-    });
-  };
-
-export const main = middyfy(checkNotion);
+    return await Promise.all(stateExecutions);
+  } catch (e) {
+    //handle error here
+  }
+};
