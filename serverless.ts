@@ -46,13 +46,6 @@ const serverlessConfiguration: Serverless = {
     Resources: {
       ...notifierTable,
     },
-    Outputs: {
-      NotifierStateMachineARN: {
-        Value: {
-          Ref: "NotifierStateMachine",
-        },
-      },
-    },
   },
 };
 
