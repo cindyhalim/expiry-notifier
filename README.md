@@ -12,14 +12,16 @@ Built using **Serverless with AWS (Step Functions, DynamoDB, Lambda), Notion API
 
 ### **Notion Table:**
 
--Create a Notion table with the following properties:
+Create a Notion table with the following properties:
 
-! [Notion Table Template](assets/notion-table-sample.png)
+![Notion Table Template](assets/notion-table-sample.png)
 
-- `item`: Text property | the event you want to be reminded for.
-- `type`: Select property | `expiry` or `reminder`; default is `expiry`.
-- `date`: Date property | due date/expiry date of item.
-- `notifyIn`: Number property | remind me in X months; default is `1`.
+| Property   | Property Type | Description                                |
+| ---------- | ------------- | ------------------------------------------ |
+| `item`     | Text          | the event you want to be reminded for.     |
+| `type`     | Select        | `expiry` or `reminder`; default: `expiry`. |
+| `date`     | Date          | due date/expiry date of item.              |
+| `notifyIn` | Number        | remind me in X months; default: `1`.       |
 
 ### **Parameters:**
 
