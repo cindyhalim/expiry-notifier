@@ -2,7 +2,7 @@ import { Serverless } from "@utils";
 
 export const functions: Serverless["functions"] = {
   checkNotion: {
-    handler: "src/functions/checkNotion/handler.main",
+    handler: "src/functions/checkNotion.main",
     iamRoleStatements: [
       {
         Effect: "Allow",
@@ -13,16 +13,16 @@ export const functions: Serverless["functions"] = {
     events: [
       {
         schedule: {
-          rate: ["cron(0 0 1 * ? *)"],
+          rate: "cron(0 0 1 * ? *)",
           enabled: true,
         },
       },
     ],
   },
   onCheckDateRequirements: {
-    handler: "src/functions/onCheckDateRequirements/handler.main",
+    handler: "src/functions/onCheckDateRequirements.main",
   },
   onNotify: {
-    handler: "src/functions/onNotify/handler.main",
+    handler: "src/functions/onNotify.main",
   },
 };

@@ -8,7 +8,7 @@ const stepFunctions = new StepFunctions();
 
 export const main = async () => {
   try {
-    const items = await notion.getItemsFromDatabase();
+    const items = await notion.getItems();
     const stateExecutions = items.map((item) =>
       stepFunctions
         .startExecution({
