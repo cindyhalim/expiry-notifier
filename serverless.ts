@@ -1,5 +1,6 @@
-import { notifierTable, notifierStateMachine, functions } from "@resources";
+import { notifierTable, notifierStateMachine } from "@resources";
 import { Serverless } from "@utils";
+import functions from "@functions";
 
 const serverlessConfiguration: Serverless = {
   service: "expiry-notifier",

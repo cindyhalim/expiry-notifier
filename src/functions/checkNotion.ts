@@ -9,7 +9,22 @@ const stepFunctions = new StepFunctions();
 export const main = async () => {
   try {
     const items = await notion.getItems();
-    const stateExecutions = items.map((item) =>
+
+    // const stateExecutions = items
+    //   .filter((item) => item)
+    //   .map((item) =>
+    //     stepFunctions
+    //       .startExecution({
+    //         stateMachineArn: process.env.NOTIFIER_STATE_MACHINE_ARN,
+    //         name: uuidv4(),
+    //         input: JSON.stringify(item),
+    //       })
+    //       .promise()
+    //   );
+
+    const stateExecutionsTest = items.filter((item) => item);
+
+    const stateExecutions = [stateExecutionsTest[0]].map((item) =>
       stepFunctions
         .startExecution({
           stateMachineArn: process.env.NOTIFIER_STATE_MACHINE_ARN,
@@ -18,6 +33,7 @@ export const main = async () => {
         })
         .promise()
     );
+
     return await Promise.all(stateExecutions);
   } catch (e) {
     throw new Error(`Error in checkNotion: ${e.message}`);

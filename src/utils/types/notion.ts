@@ -1,9 +1,18 @@
 export type NotificationType = "expiry" | "reminder";
 
-export interface NotionItem {
-  id: string;
-  item: string;
-  date: string;
-  type?: NotificationType | null;
-  notifyIn?: number | null;
+export enum ItemStatus {
+  GOOD = "good",
+  EXPIRING_SOON = "expiring soon",
+  NOTIFIED = "notified",
+  RENEWED = "renewed",
+  EXPIRED = "expired",
+  MISSING_PROPERTIES = "missing properties",
 }
+
+export type NotionItem = {
+  id: string;
+  title: string | null;
+  expiryDate: string | null;
+  notifyBeforeInMonths: number;
+  status: ItemStatus | null;
+};

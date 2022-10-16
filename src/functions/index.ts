@@ -1,6 +1,6 @@
 import { Serverless } from "@utils";
 
-export const functions: Serverless["functions"] = {
+const functions: Serverless["functions"] = {
   checkNotion: {
     handler: "src/functions/checkNotion.main",
     iamRoleStatements: [
@@ -12,17 +12,28 @@ export const functions: Serverless["functions"] = {
     ],
     events: [
       {
-        schedule: {
-          rate: "cron(0 0 1 * ? *)",
-          enabled: true,
+        http: {
+          method: "get",
+          path: "/test",
         },
       },
+      // {
+      //   schedule: {
+      //     rate: "cron(0 0 1 * ? *)",
+      //     enabled: true,
+      //   },
+      // },
     ],
   },
-  onCheckDateRequirements: {
-    handler: "src/functions/onCheckDateRequirements.main",
+  onGetStatus: {
+    handler: "src/functions/onGetStatus.handler",
+  },
+  onUpdateStatus: {
+    handler: "src/functions/onUpdateStatus.handler",
   },
   onNotify: {
     handler: "src/functions/onNotify.main",
   },
 };
+
+export default functions;

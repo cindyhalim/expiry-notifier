@@ -1,4 +1,4 @@
-import { Serverless } from "@utils";
+import { ItemStatus, Serverless } from "@utils";
 
 type StateMachine = Serverless["stepFunctions"]["stateMachines"];
 
@@ -17,9 +17,33 @@ export const notifierStateMachine: StateMachine = {
     name: "notifier-state-machine-${self:provider.stage}",
     definition: {
       Comment: "Orchestrates notify logic from Notion table",
-      StartAt: "CheckAlreadyNotified",
+      StartAt: "GetStatus",
       States: {
-        CheckAlreadyNotified: {
+        GetStatus: {
+          Type: "Task",
+          Resource: { "Fn::GetAtt": ["onGetStatus", "Arn"] },
+          Retry: retrier,
+          Next: "GetNextPath",
+        },
+        GetNextPath: {
+          Type: "Choice",
+          Choices: [
+            {
+              Comment: "Expiring soon path",
+              Variable: "$.status",
+              StringEquals: ItemStatus.EXPIRING_SOON,
+              Next: "Notify",
+            },
+            {
+              Comment: "Notified path",
+              Variable: "$.status",
+              StringEquals: ItemStatus.NOTIFIED,
+              Next: "CheckLastNotified",
+            },
+          ],
+          Default: "UpdateStatus",
+        },
+        CheckLastNotified: {
           Type: "Task",
           Resource: "arn:aws:states:::dynamodb:getItem",
           Parameters: {
@@ -32,50 +56,22 @@ export const notifierStateMachine: StateMachine = {
           },
           Retry: retrier,
           ResultPath: "$.dynamoDb",
-          Next: "VerifyAlreadyNotified",
+          Next: "ShouldNotify",
         },
-        VerifyAlreadyNotified: {
+        ShouldNotify: {
           Type: "Choice",
           Choices: [
             {
-              Variable: "$.dynamoDb.Item.itemId",
+              Variable: "$.dynamoDb.Item.lastNotified",
               IsPresent: false,
-              Next: "CheckDateRequirements",
+              Next: "Notify",
             },
             {
-              Variable: "$.dynamoDb.Item.itemId",
+              Variable: "$.dynamoDb.Item.lastNotified",
               IsPresent: true,
               Next: "SkipNotify",
             },
           ],
-          Retry: retrier,
-        },
-        CheckDateRequirements: {
-          Type: "Task",
-          Resource: { "Fn::GetAtt": ["onCheckDateRequirements", "Arn"] },
-          Retry: retrier,
-          ResultPath: "$.meetsDateRequirements",
-          Next: "VerifyDateRequirements",
-        },
-        VerifyDateRequirements: {
-          Type: "Choice",
-          Choices: [
-            {
-              Variable: "$.meetsDateRequirements",
-              BooleanEquals: true,
-              Next: "Notify",
-            },
-            {
-              Variable: "$.meetsDateRequirements",
-              BooleanEquals: false,
-              Next: "SkipNotify",
-            },
-          ],
-          Retry: retrier,
-        },
-        SkipNotify: {
-          Type: "Pass",
-          End: true,
         },
         Notify: {
           Type: "Task",
@@ -91,11 +87,23 @@ export const notifierStateMachine: StateMachine = {
             TableName: { Ref: "NotifierTable" },
             Item: {
               itemId: { "S.$": "$.id" },
-              isNotified: { "BOOL.$": "$.isNotified" },
-              timestamp: { S: new Date() },
+              lastNotified: { S: new Date() },
             },
           },
           Retry: retrier,
+          Next: "UpdateStatus",
+        },
+        UpdateStatus: {
+          Type: "Task",
+          Resource: { "Fn::GetAtt": ["onUpdateStatus", "Arn"] },
+          Parameters: {
+            "id.$": "$.id",
+            "status.$": "$.status",
+          },
+          End: true,
+        },
+        SkipNotify: {
+          Type: "Pass",
           End: true,
         },
       },

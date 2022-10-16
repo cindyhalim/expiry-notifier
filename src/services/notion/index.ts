@@ -1,10 +1,11 @@
 import { Client } from "@notionhq/client";
 import { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
-import { ItemStatus, type ExpiryNotifierItemProperties } from "./types";
+import { ItemStatus, type NotionItem } from "@utils";
+import { type ExpiryNotifierItemProperties } from "./types";
 
 const client = new Client({ auth: process.env.NOTION_TOKEN });
 
-const getItems = async () => {
+const getItems = async (): Promise<(NotionItem | null)[]> => {
   const databaseId = process.env.NOTION_DATABASE_ID;
   const response = await client.databases.query({ database_id: databaseId });
   const items = response.results.map((page: PageObjectResponse) => {
@@ -15,9 +16,10 @@ const getItems = async () => {
 
     return {
       id: page.id,
-      title: properties.item.title[0].text.content,
-      expiryDate: properties["expiry date"].date.start,
-      notifyBeforeInMonths: properties["notify in (months before)"].number,
+      title: properties.item.title[0].text.content || null,
+      expiryDate: properties["expiry date"].date.start || null,
+      notifyBeforeInMonths: properties["notify in (months before)"].number || 1,
+      status: properties["status"].select?.name || null,
     };
   });
 

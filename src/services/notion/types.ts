@@ -1,10 +1,4 @@
-export enum ItemStatus {
-  GOOD = "good",
-  EXPIRING_SOON = "expiring soon",
-  NOTIFIED = "notified",
-  RENEWED = "renewed",
-  EXPIRED = "expired",
-}
+import { ItemStatus } from "@utils";
 
 type INotionItemStatus = {
   id: string;
@@ -17,7 +11,7 @@ export type ExpiryNotifierItemProperties = {
     id: string;
     type: "date";
     date: {
-      start: string; // "2025-01-03"
+      start: string | null; // "2025-01-03"
       end: null;
       time_zone: null;
     };
@@ -25,7 +19,7 @@ export type ExpiryNotifierItemProperties = {
   "notify in (months before)": {
     id: string;
     type: "number";
-    number: number;
+    number: number | null;
   };
   status: {
     id: string;
@@ -39,7 +33,7 @@ export type ExpiryNotifierItemProperties = {
       {
         type: "text";
         text: {
-          content: string;
+          content: string | null;
           link: null;
         };
       }
