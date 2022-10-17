@@ -7,7 +7,9 @@ const client = new Client({ auth: process.env.NOTION_TOKEN });
 
 const getItems = async (): Promise<(NotionItem | null)[]> => {
   const databaseId = process.env.NOTION_DATABASE_ID;
-  const response = await client.databases.query({ database_id: databaseId });
+  const response = await client.databases.query({
+    database_id: databaseId,
+  });
   const items = response.results.map((page: PageObjectResponse) => {
     const properties =
       page.properties as unknown as ExpiryNotifierItemProperties;

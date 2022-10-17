@@ -37,24 +37,24 @@ describe("onGetStatus", () => {
     expect(response.status).toBe(ItemStatus.EXPIRED);
   });
 
-  it("returns expiring soon status if expiry date is within notify before and status is not notified", async () => {
+  it("returns expiring status if expiry date is within notify before and status is not notified", async () => {
     jest.useFakeTimers().setSystemTime(new Date("2023-03-04"));
     const mockNotionItem = createMockNotionItem({
       status: ItemStatus.GOOD,
     });
     const response = await onGetStatus(mockNotionItem);
 
-    expect(response.status).toBe(ItemStatus.EXPIRING_SOON);
+    expect(response.status).toBe(ItemStatus.EXPIRING);
   });
 
-  it("returns notified status if expiry date is within notify before and status is notified", async () => {
+  it("returns expiring status if expiry date is within notify before and status is notified", async () => {
     jest.useFakeTimers().setSystemTime(new Date("2023-03-04"));
     const mockNotionItem = createMockNotionItem({
       status: ItemStatus.NOTIFIED,
     });
     const response = await onGetStatus(mockNotionItem);
 
-    expect(response.status).toBe(ItemStatus.NOTIFIED);
+    expect(response.status).toBe(ItemStatus.EXPIRING);
   });
 
   it("returns good status if expiry date is not within notify before", async () => {

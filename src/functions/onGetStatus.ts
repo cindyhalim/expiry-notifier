@@ -1,25 +1,19 @@
 import { DateTime } from "luxon";
-import { ItemStatus, middyfy, type NotionItem } from "@utils";
+import { date, ItemStatus, middyfy, type NotionItem } from "@utils";
 
 const getShouldBeNotified = ({
   notifyBeforeInMonths,
   expiryDateTime,
-  currentDate,
 }: {
   notifyBeforeInMonths: number;
   expiryDateTime: DateTime;
-  currentDate: DateTime;
 }) => {
-  const { months: diffInMonths } = expiryDateTime
-    .diff(currentDate, "months")
-    .toObject();
-  const roundedDiff = Math.round(diffInMonths);
-
+  const roundedDiff = date.getRoundedDiffInMonths({ date: expiryDateTime });
   return roundedDiff >= 0 && roundedDiff <= notifyBeforeInMonths;
 };
 
 export const controller = async (item: NotionItem): Promise<NotionItem> => {
-  const { expiryDate, title, notifyBeforeInMonths, status } = item;
+  const { expiryDate, title, notifyBeforeInMonths } = item;
 
   if (!expiryDate || !title) {
     return {
@@ -28,7 +22,7 @@ export const controller = async (item: NotionItem): Promise<NotionItem> => {
     };
   }
 
-  const expiryDateTime = DateTime.fromFormat(expiryDate, "yyyy-MM-dd");
+  const expiryDateTime = date.expiryDateToDateTime({ date: expiryDate });
   const currentDate = DateTime.now();
 
   if (expiryDateTime <= currentDate) {
@@ -40,16 +34,11 @@ export const controller = async (item: NotionItem): Promise<NotionItem> => {
 
   const shouldBeNotified = getShouldBeNotified({
     expiryDateTime,
-    currentDate,
     notifyBeforeInMonths,
   });
 
-  if (status === ItemStatus.NOTIFIED && shouldBeNotified) {
-    return item;
-  }
-
   if (shouldBeNotified) {
-    return { ...item, status: ItemStatus.EXPIRING_SOON };
+    return { ...item, status: ItemStatus.EXPIRING };
   }
 
   return { ...item, status: ItemStatus.GOOD };

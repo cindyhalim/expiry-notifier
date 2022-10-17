@@ -28,11 +28,14 @@ const functions: Serverless["functions"] = {
   onGetStatus: {
     handler: "src/functions/onGetStatus.handler",
   },
+  onGetNotificationType: {
+    handler: "src/functions/onGetNotificationType.handler",
+  },
   onUpdateStatus: {
     handler: "src/functions/onUpdateStatus.handler",
   },
   onNotify: {
-    handler: "src/functions/onNotify.main",
+    handler: "src/functions/onNotify.handler",
   },
 };
 

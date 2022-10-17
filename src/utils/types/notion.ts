@@ -1,8 +1,11 @@
-export type NotificationType = "expiry" | "reminder";
+export enum NotificationType {
+  FIRST_REMINDER = "first_reminder",
+  FOLLOW_UP = "follow_up",
+}
 
 export enum ItemStatus {
   GOOD = "good",
-  EXPIRING_SOON = "expiring soon",
+  EXPIRING = "expiring",
   NOTIFIED = "notified",
   RENEWED = "renewed",
   EXPIRED = "expired",

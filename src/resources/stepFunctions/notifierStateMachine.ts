@@ -29,15 +29,9 @@ export const notifierStateMachine: StateMachine = {
           Type: "Choice",
           Choices: [
             {
-              Comment: "Expiring soon path",
+              Comment: "Expiring path",
               Variable: "$.status",
-              StringEquals: ItemStatus.EXPIRING_SOON,
-              Next: "Notify",
-            },
-            {
-              Comment: "Notified path",
-              Variable: "$.status",
-              StringEquals: ItemStatus.NOTIFIED,
+              StringEquals: ItemStatus.EXPIRING,
               Next: "CheckLastNotified",
             },
           ],
@@ -54,29 +48,19 @@ export const notifierStateMachine: StateMachine = {
               },
             },
           },
-          Retry: retrier,
           ResultPath: "$.dynamoDb",
-          Next: "ShouldNotify",
+          Retry: retrier,
+          Next: "GetNotificationType",
         },
-        ShouldNotify: {
-          Type: "Choice",
-          Choices: [
-            {
-              Variable: "$.dynamoDb.Item.lastNotified",
-              IsPresent: false,
-              Next: "Notify",
-            },
-            {
-              Variable: "$.dynamoDb.Item.lastNotified",
-              IsPresent: true,
-              Next: "SkipNotify",
-            },
-          ],
+        GetNotificationType: {
+          Type: "Task",
+          Resource: { "Fn::GetAtt": ["onGetNotificationType", "Arn"] },
+          Retry: retrier,
+          Next: "Notify",
         },
         Notify: {
           Type: "Task",
           Resource: { "Fn::GetAtt": ["onNotify", "Arn"] },
-          ResultPath: "$.isNotified",
           Next: "MarkAsNotified",
           Retry: retrier,
         },
@@ -91,6 +75,7 @@ export const notifierStateMachine: StateMachine = {
             },
           },
           Retry: retrier,
+          ResultPath: "$.dynamoDb",
           Next: "UpdateStatus",
         },
         UpdateStatus: {
@@ -100,10 +85,6 @@ export const notifierStateMachine: StateMachine = {
             "id.$": "$.id",
             "status.$": "$.status",
           },
-          End: true,
-        },
-        SkipNotify: {
-          Type: "Pass",
           End: true,
         },
       },
